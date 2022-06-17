@@ -1,0 +1,80 @@
+;
+; kkrl.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System ; TODO: specify appropriate Class
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=kkrl.cat
+DriverVer = 06/18/2022,0.0.54.764
+PnpLockdown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+kkrl_Device_CoInstaller_CopyFiles = 11
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+kkrl.sys  = 1,,
+;
+
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%kkrl.DeviceDesc%=kkrl_Device, Root\kkrl ; TODO: edit hw-id
+
+[kkrl_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+kkrl.sys
+
+;-------------- Service installation
+[kkrl_Device.NT.Services]
+AddService = kkrl,%SPSVCINST_ASSOCSERVICE%, kkrl_Service_Inst
+
+; -------------- kkrl driver install sections
+[kkrl_Service_Inst]
+DisplayName    = %kkrl.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 0               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\kkrl.sys
+
+;
+;--- kkrl_Device Coinstaller installation ------
+;
+
+[kkrl_Device.NT.CoInstallers]
+AddReg=kkrl_Device_CoInstaller_AddReg
+CopyFiles=kkrl_Device_CoInstaller_CopyFiles
+
+[kkrl_Device_CoInstaller_AddReg]
+;
+
+
+[kkrl_Device_CoInstaller_CopyFiles]
+;
+
+
+[kkrl_Device.NT.Wdf]
+KmdfService =  kkrl, kkrl_wdfsect
+[kkrl_wdfsect]
+KmdfLibraryVersion = 1.15
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName = "kkrl Installation Disk"
+kkrl.DeviceDesc = "kkrl Device"
+kkrl.SVCDESC = "kkrl Service"
